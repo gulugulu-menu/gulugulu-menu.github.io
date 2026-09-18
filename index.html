@@ -104,7 +104,7 @@ setLang((navigator.language || 'pl').toLowerCase().startsWith('pl') ? 'pl' : 'en
 
 <script>
 (function () {
-  var TOKEN = 'TUTAJ_WKLEJ_TOKEN_CLOUDFLARE';   // <-- jedyne do uzupelnienia
+  var TOKEN = 'f3f8b8df00b3459f8766e07d53846ff0';   // <-- jedyne do uzupelnienia
   if (TOKEN.indexOf('TUTAJ') === 0) return;      // brak tokenu = nie liczymy
   var klucz = 'gg:' + location.pathname;
   var dzis  = new Date().toISOString().slice(0, 10);
@@ -113,7 +113,7 @@ setLang((navigator.language || 'pl').toLowerCase().startsWith('pl') ? 'pl' : 'en
     localStorage.setItem(klucz, dzis);
   } catch (e) { /* tryb prywatny — liczymy normalnie */ }
   var s = document.createElement('script');
-  s.defer = true;
+  s.type = 'module';
   s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
   s.setAttribute('data-cf-beacon', JSON.stringify({ token: TOKEN }));
   document.body.appendChild(s);
