@@ -103,19 +103,22 @@ setLang((navigator.language || 'pl').toLowerCase().startsWith('pl') ? 'pl' : 'en
 </script>
 
 <script>
+window.licznikGotowy = false;                    // ekran przejsciowy na to czeka
 (function () {
-  var TOKEN = 'f3f8b8df00b3459f8766e07d53846ff0';   // <-- jedyne do uzupelnienia
-  if (TOKEN.indexOf('TUTAJ') === 0) return;      // brak tokenu = nie liczymy
+  function koniec() { window.licznikGotowy = true; }
+  var TOKEN = 'f3f8b8df00b3459f8766e07d53846ff0';
+  if (TOKEN.indexOf('TUTAJ') === 0) return koniec();   // brak tokenu = nie liczymy
   var klucz = 'gg:' + location.pathname;
   var dzis  = new Date().toISOString().slice(0, 10);
   try {
-    if (localStorage.getItem(klucz) === dzis) return;   // juz liczone dzisiaj
+    if (localStorage.getItem(klucz) === dzis) return koniec();  // juz liczone dzis
     localStorage.setItem(klucz, dzis);
   } catch (e) { /* tryb prywatny — liczymy normalnie */ }
   var s = document.createElement('script');
   s.type = 'module';
   s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
   s.setAttribute('data-cf-beacon', JSON.stringify({ token: TOKEN }));
+  s.onload = s.onerror = koniec;
   document.body.appendChild(s);
 })();
 </script>

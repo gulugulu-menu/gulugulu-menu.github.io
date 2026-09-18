@@ -31,19 +31,22 @@
   </script>
   
 <script>
+window.licznikGotowy = false;                    // ekran przejsciowy na to czeka
 (function () {
-  var TOKEN = 'f3f8b8df00b3459f8766e07d53846ff0';   // <-- jedyne do uzupelnienia
-  if (TOKEN.indexOf('TUTAJ') === 0) return;      // brak tokenu = nie liczymy
+  function koniec() { window.licznikGotowy = true; }
+  var TOKEN = 'f3f8b8df00b3459f8766e07d53846ff0';
+  if (TOKEN.indexOf('TUTAJ') === 0) return koniec();   // brak tokenu = nie liczymy
   var klucz = 'gg:' + location.pathname;
   var dzis  = new Date().toISOString().slice(0, 10);
   try {
-    if (localStorage.getItem(klucz) === dzis) return;   // juz liczone dzisiaj
+    if (localStorage.getItem(klucz) === dzis) return koniec();  // juz liczone dzis
     localStorage.setItem(klucz, dzis);
   } catch (e) { /* tryb prywatny — liczymy normalnie */ }
   var s = document.createElement('script');
   s.type = 'module';
   s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
   s.setAttribute('data-cf-beacon', JSON.stringify({ token: TOKEN }));
+  s.onload = s.onerror = koniec;
   document.body.appendChild(s);
 })();
 </script>
@@ -55,8 +58,13 @@
       document.body.classList.add('stoi');
       document.getElementById('info').hidden = false;
     } else {
-      // 500 ms wystarcza, zeby licznik zdazyl wyslac zgloszenie
-      setTimeout(function () { location.replace(CEL); }, 500);
+      // Czekamy, az licznik wyslie zgloszenie — ale nie dluzej niz 1,5 s,
+      // zeby gosc nie gapil sie w ekran przejsciowy przy slabym zasiegu.
+      var t0 = Date.now();
+      (function czekaj() {
+        if (window.licznikGotowy || Date.now() - t0 > 1500) location.replace(CEL);
+        else setTimeout(czekaj, 100);
+      })();
     }
   </script>
 </body></html>
